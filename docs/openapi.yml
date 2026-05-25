@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+  title: MediReservas API
+  version: 1.0.0
+  description: Contratos principales de la plataforma de reservas medicas.
+servers:
+  - url: http://localhost:8081
+security:
+  - bearerAuth: []
+paths:
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Registra un usuario
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string }
+                role: { type: string, enum: [patient, doctor, admin] }
+      responses:
+        "201": { description: Usuario registrado }
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Inicia sesion
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200": { description: Token y usuario }
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Devuelve el usuario autenticado
+      responses:
+        "200": { description: Usuario autenticado }
+  /api/agenda/doctors:
+    get:
+      tags: [Agenda]
+      summary: Lista medicos
+      security: []
+      responses:
+        "200": { description: Lista de medicos }
+    post:
+      tags: [Agenda]
+      summary: Crea o actualiza perfil medico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [specialty, licenseNumber, office]
+              properties:
+                specialty: { type: string }
+                licenseNumber: { type: string }
+                office: { type: string }
+      responses:
+        "201": { description: Perfil medico guardado }
+  /api/agenda/availability:
+    post:
+      tags: [Agenda]
+      summary: Publica disponibilidad de un medico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [startsAt, endsAt]
+              properties:
+                startsAt: { type: string, format: date-time }
+                endsAt: { type: string, format: date-time }
+      responses:
+        "201": { description: Horario creado }
+  /api/agenda/doctors/{doctorId}/availability:
+    get:
+      tags: [Agenda]
+      summary: Lista horarios disponibles de un medico
+      security: []
+      parameters:
+        - in: path
+          name: doctorId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200": { description: Horarios disponibles }
+  /api/agenda/appointments:
+    post:
+      tags: [Agenda]
+      summary: Agenda una cita
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [doctorId, slotId, reason]
+              properties:
+                doctorId: { type: string, format: uuid }
+                slotId: { type: string, format: uuid }
+                reason: { type: string }
+      responses:
+        "201": { description: Cita creada }
+  /api/agenda/appointments/me:
+    get:
+      tags: [Agenda]
+      summary: Lista citas del usuario autenticado
+      responses:
+        "200": { description: Citas del usuario }
+  /api/agenda/appointments/{id}:
+    patch:
+      tags: [Agenda]
+      summary: Actualiza una cita
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200": { description: Cita actualizada }
+    delete:
+      tags: [Agenda]
+      summary: Cancela una cita
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Cita cancelada }
+  /api/notifications/me:
+    get:
+      tags: [Notifications]
+      summary: Lista notificaciones del usuario
+      responses:
+        "200": { description: Notificaciones }
+  /api/records/results:
+    post:
+      tags: [Records]
+      summary: Registra resultado de consulta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patientId, summary]
+              properties:
+                appointmentId: { type: string, format: uuid }
+                patientId: { type: string, format: uuid }
+                summary: { type: string }
+                prescription: { type: string }
+      responses:
+        "201": { description: Resultado registrado }
+  /api/records/me:
+    get:
+      tags: [Records]
+      summary: Lista resultados del usuario
+      responses:
+        "200": { description: Resultados }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: med-analisis-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-med_reservas}
+      POSTGRES_USER: ${POSTGRES_USER:-med_reservas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-med_reservas}
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-med_reservas} -d ${POSTGRES_DB:-med_reservas}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  auth-service:
+    build: ./services/auth
+    container_name: med-analisis-auth-service
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://${POSTGRES_USER:-med_reservas}:${POSTGRES_PASSWORD:-med_reservas}@postgres:5432/${POSTGRES_DB:-med_reservas}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      CORS_ORIGIN: http://localhost:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  agenda-service:
+    build: ./services/agenda
+    container_name: med-analisis-agenda-service
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgres://${POSTGRES_USER:-med_reservas}:${POSTGRES_PASSWORD:-med_reservas}@postgres:5432/${POSTGRES_DB:-med_reservas}
+      AUTH_SERVICE_URL: http://auth-service:3001
+      NOTIFICATIONS_SERVICE_URL: http://notifications-service:3003
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-internal-dev-token}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  notifications-service:
+    build: ./services/notifications
+    container_name: med-analisis-notifications-service
+    environment:
+      PORT: 3003
+      DATABASE_URL: postgres://${POSTGRES_USER:-med_reservas}:${POSTGRES_PASSWORD:-med_reservas}@postgres:5432/${POSTGRES_DB:-med_reservas}
+      AUTH_SERVICE_URL: http://auth-service:3001
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-internal-dev-token}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  records-service:
+    build: ./services/records
+    container_name: med-analisis-records-service
+    environment:
+      PORT: 3004
+      DATABASE_URL: postgres://${POSTGRES_USER:-med_reservas}:${POSTGRES_PASSWORD:-med_reservas}@postgres:5432/${POSTGRES_DB:-med_reservas}
+      AUTH_SERVICE_URL: http://auth-service:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: med-analisis-api-gateway
+    ports:
+      - "8081:80"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - auth-service
+      - agenda-service
+      - notifications-service
+      - records-service
+
+volumes:
+  postgres_data:

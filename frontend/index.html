@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediReservas</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel intro">
+        <p class="eyebrow">Plataforma de reservas medicas</p>
+        <h1>MediReservas</h1>
+        <p>Agenda, disponibilidad, notificaciones y resultados en una solucion desacoplada por microservicios.</p>
+        <div class="demo-users">
+          <span>Doctor: ana.doctor@demo.com / Demo123!</span>
+          <span>Paciente: luis.paciente@demo.com / Demo123!</span>
+        </div>
+      </section>
+
+      <section class="panel auth-card">
+        <div class="tabs">
+          <button id="loginTab" class="active" type="button">Ingresar</button>
+          <button id="registerTab" type="button">Crear cuenta</button>
+        </div>
+
+        <form id="loginForm" class="form">
+          <label>Correo <input name="email" type="email" value="luis.paciente@demo.com" required /></label>
+          <label>Contrasena <input name="password" type="password" value="Demo123!" required /></label>
+          <button type="submit">Entrar</button>
+        </form>
+
+        <form id="registerForm" class="form hidden">
+          <label>Nombre <input name="name" required /></label>
+          <label>Correo <input name="email" type="email" required /></label>
+          <label>Contrasena <input name="password" type="password" required /></label>
+          <label>Rol
+            <select name="role">
+              <option value="patient">Paciente</option>
+              <option value="doctor">Medico</option>
+            </select>
+          </label>
+          <button type="submit">Registrarme</button>
+        </form>
+      </section>
+
+      <section id="appView" class="workspace hidden">
+        <header>
+          <div>
+            <p class="eyebrow">Sesion activa</p>
+            <h2 id="userTitle"></h2>
+          </div>
+          <button id="logoutBtn" type="button">Salir</button>
+        </header>
+
+        <section class="grid">
+          <article class="panel">
+            <h3>Medicos</h3>
+            <div id="doctorsList" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Disponibilidad</h3>
+            <form id="availabilityForm" class="form compact hidden">
+              <label>Inicio <input name="startsAt" type="datetime-local" required /></label>
+              <label>Fin <input name="endsAt" type="datetime-local" required /></label>
+              <button type="submit">Publicar horario</button>
+            </form>
+            <div id="slotsList" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Mis citas</h3>
+            <div id="appointmentsList" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Notificaciones</h3>
+            <div id="notificationsList" class="list"></div>
+          </article>
+        </section>
+      </section>
+
+      <div id="toast" class="toast hidden"></div>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
+

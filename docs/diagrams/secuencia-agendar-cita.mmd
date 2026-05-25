@@ -1,0 +1,18 @@
+sequenceDiagram
+  actor P as Paciente
+  participant G as API Gateway
+  participant A as Agenda Service
+  participant AU as Auth Service
+  participant DB as PostgreSQL
+  participant N as Notifications Service
+  P->>G: POST /api/agenda/appointments
+  G->>A: Reenvia solicitud
+  A->>AU: GET /internal/verify
+  AU-->>A: Usuario valido
+  A->>DB: Bloquea slot disponible
+  A->>DB: Crea cita y marca slot booked
+  A->>N: POST /internal/notifications
+  N->>DB: Guarda notificacion
+  A-->>G: 201 cita creada
+  G-->>P: Confirmacion
+

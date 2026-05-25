@@ -1,0 +1,16 @@
+flowchart LR
+  Paciente["Paciente / Medico"] --> Gateway["API Gateway NGINX"]
+  Gateway --> Frontend["Frontend estatico"]
+  Gateway --> Auth["Auth Service"]
+  Gateway --> Agenda["Agenda Service"]
+  Gateway --> Notifications["Notifications Service"]
+  Gateway --> Records["Records Service"]
+  Auth --> DB[(PostgreSQL)]
+  Agenda --> DB
+  Notifications --> DB
+  Records --> DB
+  Agenda -. evento interno .-> Notifications
+  Agenda -. valida token .-> Auth
+  Notifications -. valida token .-> Auth
+  Records -. valida token .-> Auth
+

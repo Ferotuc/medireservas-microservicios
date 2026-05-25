@@ -1,0 +1,13 @@
+flowchart TB
+  Paciente["Paciente"] --> UC1["Registrarse / iniciar sesion"]
+  Paciente --> UC2["Consultar medicos"]
+  Paciente --> UC3["Agendar cita"]
+  Paciente --> UC4["Cancelar cita"]
+  Paciente --> UC5["Ver notificaciones"]
+  Paciente --> UC6["Consultar resultados"]
+  Medico["Medico"] --> UC1
+  Medico --> UC7["Registrar perfil medico"]
+  Medico --> UC8["Publicar disponibilidad"]
+  Medico --> UC9["Consultar agenda"]
+  Medico --> UC10["Registrar resultado"]
+
