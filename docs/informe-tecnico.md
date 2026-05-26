@@ -141,6 +141,8 @@ Al ejecutar el proyecto se puede evidenciar:
 4. Reserva de cita desde cuenta de paciente.
 5. Cancelacion de cita.
 6. Notificaciones internas generadas por el servicio de agenda.
+7. Registro de resultados medicos por el medico.
+8. Consulta de resultados medicos por el paciente.
 
 Las capturas de pantalla para el PDF pueden tomarse desde `http://localhost:8081` despues de levantar los contenedores.
 
@@ -152,6 +154,12 @@ docker compose up --build
 ```
 
 Abrir `http://localhost:8081`.
+
+Para validar el flujo completo por API:
+
+```powershell
+.\scripts\smoke-test.ps1
+```
 
 Usuarios demo:
 

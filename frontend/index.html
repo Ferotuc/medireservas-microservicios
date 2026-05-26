@@ -78,6 +78,23 @@
             <h3>Notificaciones</h3>
             <div id="notificationsList" class="list"></div>
           </article>
+
+          <article class="panel wide">
+            <h3>Resultados medicos</h3>
+            <form id="recordForm" class="form compact hidden">
+              <label>Cita
+                <select name="appointmentRef" id="recordAppointment" required></select>
+              </label>
+              <label>Resumen clinico
+                <textarea name="summary" rows="3" required></textarea>
+              </label>
+              <label>Prescripcion
+                <textarea name="prescription" rows="2"></textarea>
+              </label>
+              <button type="submit">Guardar resultado</button>
+            </form>
+            <div id="recordsList" class="list"></div>
+          </article>
         </section>
       </section>
 
@@ -86,4 +103,3 @@
     <script src="/app.js"></script>
   </body>
 </html>
-

@@ -1,7 +1,8 @@
 const state = {
   token: localStorage.getItem('token'),
   user: JSON.parse(localStorage.getItem('user') || 'null'),
-  selectedDoctor: null
+  selectedDoctor: null,
+  appointments: []
 };
 
 const qs = (selector) => document.querySelector(selector);
@@ -48,7 +49,9 @@ const renderSession = async () => {
   if (!state.token) return;
   qs('#userTitle').textContent = `${state.user.name} (${state.user.role})`;
   qs('#availabilityForm').classList.toggle('hidden', state.user.role !== 'doctor');
+  qs('#recordForm').classList.toggle('hidden', state.user.role !== 'doctor');
   await Promise.all([loadDoctors(), loadAppointments(), loadNotifications()]);
+  await loadRecords();
 };
 
 const loadDoctors = async () => {
@@ -93,22 +96,33 @@ const loadSlots = async (doctorId) => {
 
 const loadAppointments = async () => {
   const { appointments } = await api('/api/agenda/appointments/me');
+  state.appointments = appointments;
   qs('#appointmentsList').innerHTML = appointments.map((appointment) => `
     <div class="item">
       <strong>${new Date(appointment.starts_at).toLocaleString()}</strong>
       <small>${appointment.patient_name} con ${appointment.doctor_name} - ${appointment.status}</small>
       <p>${appointment.reason}</p>
+      ${state.user.role === 'doctor' && appointment.status !== 'cancelled' ? `<button type="button" data-record="${appointment.id}">Registrar resultado</button>` : ''}
       ${appointment.status !== 'cancelled' ? `<button class="danger" type="button" data-id="${appointment.id}">Cancelar</button>` : ''}
     </div>
   `).join('') || '<small>No tienes citas.</small>';
 
-  qs('#appointmentsList').querySelectorAll('button').forEach((button) => {
+  qs('#appointmentsList').querySelectorAll('button[data-id]').forEach((button) => {
     button.addEventListener('click', async () => {
       await api(`/api/agenda/appointments/${button.dataset.id}`, { method: 'DELETE' });
       toast('Cita cancelada');
       await Promise.all([loadAppointments(), loadNotifications()]);
     });
   });
+
+  qs('#appointmentsList').querySelectorAll('button[data-record]').forEach((button) => {
+    button.addEventListener('click', () => {
+      qs('#recordAppointment').value = button.dataset.record;
+      qs('#recordForm textarea[name="summary"]').focus();
+    });
+  });
+
+  renderRecordAppointmentOptions();
 };
 
 const loadNotifications = async () => {
@@ -120,6 +134,32 @@ const loadNotifications = async () => {
       <p>${notification.body}</p>
     </div>
   `).join('') || '<small>No hay notificaciones.</small>';
+};
+
+const renderRecordAppointmentOptions = () => {
+  if (state.user?.role !== 'doctor') return;
+  const options = state.appointments
+    .filter((appointment) => appointment.status !== 'cancelled')
+    .map((appointment) => `
+      <option value="${appointment.id}">
+        ${appointment.patient_name} - ${new Date(appointment.starts_at).toLocaleString()}
+      </option>
+    `)
+    .join('');
+
+  qs('#recordAppointment').innerHTML = options || '<option value="">No hay citas activas</option>';
+};
+
+const loadRecords = async () => {
+  const { results } = await api('/api/records/me');
+  qs('#recordsList').innerHTML = results.map((result) => `
+    <div class="item">
+      <strong>${result.patient_name} - ${new Date(result.created_at).toLocaleString()}</strong>
+      <small>Medico: ${result.doctor_name}</small>
+      <p>${result.summary}</p>
+      ${result.prescription ? `<small>Prescripcion: ${result.prescription}</small>` : ''}
+    </div>
+  `).join('') || '<small>No hay resultados registrados.</small>';
 };
 
 qs('#loginTab').addEventListener('click', () => {
@@ -175,6 +215,32 @@ qs('#availabilityForm').addEventListener('submit', async (event) => {
   }
 });
 
+qs('#recordForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const body = Object.fromEntries(new FormData(event.target));
+  const appointment = state.appointments.find((item) => item.id === body.appointmentRef);
+  if (!appointment) {
+    toast('Selecciona una cita activa');
+    return;
+  }
+
+  try {
+    await api('/api/records/results', {
+      method: 'POST',
+      body: JSON.stringify({
+        appointmentId: appointment.id,
+        patientId: appointment.patient_id,
+        summary: body.summary,
+        prescription: body.prescription
+      })
+    });
+    event.target.reset();
+    toast('Resultado registrado');
+    await loadRecords();
+  } catch (error) {
+    toast(error.message);
+  }
+});
+
 qs('#logoutBtn').addEventListener('click', clearSession);
 renderSession();
-

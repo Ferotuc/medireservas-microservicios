@@ -45,3 +45,13 @@ Usuarios demo:
 - `GET /api/records/me`
 
 La documentacion tecnica para el PDF esta en [`docs/informe-tecnico.md`](docs/informe-tecnico.md) y el contrato de API esta en [`docs/openapi.yml`](docs/openapi.yml).
+
+## Pruebas
+
+Con los contenedores levantados, ejecuta:
+
+```powershell
+.\scripts\smoke-test.ps1
+```
+
+La guia completa de pruebas esta en [`docs/guia-pruebas.md`](docs/guia-pruebas.md).
