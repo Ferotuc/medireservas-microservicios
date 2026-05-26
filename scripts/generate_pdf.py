@@ -287,7 +287,8 @@ def build():
         p("Evidencia del sistema", st["Heading1"]),
         *bullets(
             [
-                "Frontend disponible en http://localhost:8081.",
+                "Portal paciente disponible en http://localhost:8081.",
+                "Portal medico disponible en http://localhost:8082.",
                 "Login probado con luis.paciente@demo.com y ana.doctor@demo.com.",
                 "Prueba realizada: medico publica disponibilidad, paciente agenda cita y se genera notificacion.",
                 "Prueba adicional: medico registra resultado y paciente consulta historial.",
@@ -304,7 +305,7 @@ def build():
                 ["1", "cd \"fernando proyecto analisis\""],
                 ["2", "cp .env.example .env"],
                 ["3", "docker compose up --build"],
-                ["4", "Abrir http://localhost:8081"],
+                ["4", "Abrir portal paciente en http://localhost:8081 o portal medico en http://localhost:8082"],
             ],
             [0.8 * inch, 5.5 * inch],
         ),

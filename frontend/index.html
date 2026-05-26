@@ -9,9 +9,9 @@
   <body>
     <main class="shell">
       <section class="panel intro">
-        <p class="eyebrow">Plataforma de reservas medicas</p>
-        <h1>MediReservas</h1>
-        <p>Agenda, disponibilidad, notificaciones y resultados en una solucion desacoplada por microservicios.</p>
+        <p id="portalEyebrow" class="eyebrow">Plataforma de reservas medicas</p>
+        <h1 id="portalTitle">MediReservas</h1>
+        <p id="portalDescription">Agenda, disponibilidad, notificaciones y resultados en una solucion desacoplada por microservicios.</p>
         <div class="demo-users">
           <span>Doctor: ana.doctor@demo.com / Demo123!</span>
           <span>Paciente: luis.paciente@demo.com / Demo123!</span>
@@ -25,7 +25,7 @@
         </div>
 
         <form id="loginForm" class="form">
-          <label>Correo <input name="email" type="email" value="luis.paciente@demo.com" required /></label>
+          <label>Correo <input id="loginEmail" name="email" type="email" value="luis.paciente@demo.com" required /></label>
           <label>Contrasena <input name="password" type="password" value="Demo123!" required /></label>
           <button type="submit">Entrar</button>
         </form>

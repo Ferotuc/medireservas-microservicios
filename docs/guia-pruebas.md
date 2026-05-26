@@ -12,7 +12,8 @@ docker compose up --build
 Abrir:
 
 ```text
-http://localhost:8081
+Portal paciente: http://localhost:8081
+Portal medico: http://localhost:8082
 ```
 
 ## 2. Verificar contenedores
@@ -77,4 +78,3 @@ El script valida:
 6. Medico registrando resultado.
 7. Paciente consultando resultado.
 8. Repositorio publico en GitHub.
-

@@ -4,7 +4,7 @@ Plataforma de reservas para consultas medicas implementada con arquitectura de m
 
 ## Arquitectura
 
-- API Gateway: NGINX en `http://localhost:8081`.
+- API Gateway: NGINX en `http://localhost:8081` y `http://localhost:8082`.
 - Auth Service: usuarios, roles y tokens.
 - Agenda Service: perfiles medicos, disponibilidad y citas.
 - Notifications Service: mensajes internos generados por eventos de agenda.
@@ -19,7 +19,10 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Luego abre `http://localhost:8081`.
+Luego abre uno de los portales:
+
+- Paciente: `http://localhost:8081`
+- Medico: `http://localhost:8082`
 
 Usuarios demo:
 

@@ -6,6 +6,22 @@ const state = {
 };
 
 const qs = (selector) => document.querySelector(selector);
+const portal = window.location.port === '8082'
+  ? {
+      role: 'doctor',
+      eyebrow: 'Portal medico',
+      title: 'MediReservas Medicos',
+      description: 'Administra disponibilidad, revisa agenda y registra resultados de consulta.',
+      email: 'ana.doctor@demo.com'
+    }
+  : {
+      role: 'patient',
+      eyebrow: 'Portal paciente',
+      title: 'MediReservas Pacientes',
+      description: 'Busca medicos, agenda citas, revisa notificaciones y consulta tus resultados.',
+      email: 'luis.paciente@demo.com'
+    };
+
 const toast = (message) => {
   const box = qs('#toast');
   box.textContent = message;
@@ -41,6 +57,14 @@ const clearSession = () => {
   state.user = null;
   localStorage.clear();
   renderSession();
+};
+
+const configurePortal = () => {
+  qs('#portalEyebrow').textContent = portal.eyebrow;
+  qs('#portalTitle').textContent = portal.title;
+  qs('#portalDescription').textContent = portal.description;
+  qs('#loginEmail').value = portal.email;
+  document.title = portal.title;
 };
 
 const renderSession = async () => {
@@ -243,4 +267,5 @@ qs('#recordForm').addEventListener('submit', async (event) => {
 });
 
 qs('#logoutBtn').addEventListener('click', clearSession);
+configurePortal();
 renderSession();

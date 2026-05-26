@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$baseUrl = "http://localhost:8081"
+$baseUrl = if ($env:BASE_URL) { $env:BASE_URL } else { "http://localhost:8081" }
 
 function Invoke-Json {
   param (
@@ -84,4 +84,3 @@ Write-Host ""
 Write-Host "Smoke test exitoso"
 Write-Host "Cita: $($appointment.appointment.id)"
 Write-Host "Resultado: $($record.result.id)"
-

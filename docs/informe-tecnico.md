@@ -153,7 +153,10 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Abrir `http://localhost:8081`.
+Abrir:
+
+- Portal paciente: `http://localhost:8081`
+- Portal medico: `http://localhost:8082`
 
 Para validar el flujo completo por API:
 

@@ -5,6 +5,7 @@ info:
   description: Contratos principales de la plataforma de reservas medicas.
 servers:
   - url: http://localhost:8081
+  - url: http://localhost:8082
 security:
   - bearerAuth: []
 paths:
