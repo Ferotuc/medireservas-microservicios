@@ -292,7 +292,7 @@ def build():
                 "Portal paciente disponible en http://localhost:8081.",
                 "Portal medico disponible en http://localhost:8082.",
                 "Login probado con luis.paciente@demo.com y ana.doctor@demo.com.",
-                "Prueba realizada: medico publica disponibilidad, paciente agenda cita y se genera notificacion.",
+                "Prueba realizada: medico configura perfil, publica disponibilidad, paciente agenda cita y se genera notificacion.",
                 "Prueba adicional: medico lista y registra pacientes.",
                 "Prueba adicional: paciente modifica y reprograma cita.",
                 "Prueba adicional: medico registra resultado y paciente consulta historial.",

@@ -140,7 +140,7 @@ Al ejecutar el proyecto se puede evidenciar:
 
 1. Pantalla de inicio de sesion y registro.
 2. Listado de medicos.
-3. Publicacion de disponibilidad desde cuenta de medico.
+3. Configuracion de perfil medico y publicacion de disponibilidad.
 4. Listado y registro de pacientes desde portal medico.
 5. Reserva de cita desde cuenta de paciente.
 6. Modificacion y reprogramacion de cita desde cuenta de paciente.

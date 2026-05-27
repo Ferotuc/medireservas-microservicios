@@ -36,11 +36,12 @@ Resultado esperado:
 ### Medico
 
 1. Iniciar sesion con `ana.doctor@demo.com` y `Demo123!`.
-2. Crear un horario en la seccion Disponibilidad.
-3. Revisar la agenda en Mis citas cuando el paciente agende.
-4. Ver pacientes registrados en la seccion Pacientes.
-5. Agregar un nuevo paciente desde la seccion Pacientes.
-6. Registrar un resultado medico en la seccion Resultados medicos.
+2. Si es un medico nuevo, completar y guardar la seccion Perfil medico.
+3. Crear un horario en la seccion Disponibilidad.
+4. Revisar la agenda en Mis citas cuando el paciente agende.
+5. Ver pacientes registrados en la seccion Pacientes.
+6. Agregar un nuevo paciente desde la seccion Pacientes.
+7. Registrar un resultado medico en la seccion Resultados medicos.
 
 ### Paciente
 

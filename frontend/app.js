@@ -97,6 +97,7 @@ const renderSession = async () => {
   qs('#availabilityForm').classList.toggle('hidden', state.user.role !== 'doctor');
   qs('#recordForm').classList.toggle('hidden', state.user.role !== 'doctor');
   qs('#patientsPanel').classList.toggle('hidden', state.user.role !== 'doctor');
+  qs('#doctorProfilePanel').classList.toggle('hidden', state.user.role !== 'doctor');
   await Promise.all([loadDoctors(), loadAppointments(), loadNotifications()]);
   if (state.user.role === 'doctor') await loadPatients();
   await loadRecords();
@@ -309,6 +310,21 @@ qs('#availabilityForm').addEventListener('submit', async (event) => {
     });
     event.target.reset();
     toast('Horario publicado');
+    await loadDoctors();
+  } catch (error) {
+    toast(error.message);
+  }
+});
+
+qs('#doctorProfileForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const body = Object.fromEntries(new FormData(event.target));
+  try {
+    await api('/api/agenda/doctors', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    toast('Perfil medico actualizado');
     await loadDoctors();
   } catch (error) {
     toast(error.message);
