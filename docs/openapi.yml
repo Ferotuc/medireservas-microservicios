@@ -81,7 +81,7 @@ paths:
   /api/agenda/doctors:
     get:
       tags: [Agenda]
-      summary: Lista medicos
+      summary: Lista medicos con disponibilidad futura
       security: []
       responses:
         "200": { description: Lista de medicos }

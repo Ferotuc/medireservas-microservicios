@@ -47,14 +47,15 @@ Resultado esperado:
 
 1. Iniciar sesion con `luis.paciente@demo.com` y `Demo123!`.
 2. Seleccionar un medico.
-3. Ver horarios disponibles.
-4. Agendar una cita con un motivo.
-5. Revisar Mis citas.
-6. Modificar el motivo de la cita.
-7. Reprogramar la cita a otro horario disponible.
-8. Cancelar una cita si se necesita.
-9. Revisar Notificaciones.
-10. Consultar Resultados medicos cuando el medico registre el resultado.
+3. Ver medicos disponibles con contador de horarios.
+4. Ver horarios disponibles.
+5. Agendar una cita con un motivo.
+6. Revisar Mis citas.
+7. Modificar el motivo de la cita.
+8. Reprogramar la cita a otro horario disponible.
+9. Cancelar una cita si se necesita.
+10. Revisar Notificaciones.
+11. Consultar Resultados medicos cuando el medico registre el resultado.
 
 ## 4. Smoke test automatizado
 

@@ -46,10 +46,20 @@ app.get('/health', (_req, res) => res.json({ service: 'agenda', status: 'ok' }))
 
 app.get('/api/agenda/doctors', async (_req, res) => {
   const result = await pool.query(`
-    SELECT d.id, d.specialty, d.license_number, d.office, u.name, u.email
+    SELECT
+      d.id,
+      d.specialty,
+      d.license_number,
+      d.office,
+      u.name,
+      u.email,
+      COUNT(s.id) FILTER (WHERE s.status = 'available' AND s.starts_at > now())::int AS available_slots,
+      MIN(s.starts_at) FILTER (WHERE s.status = 'available' AND s.starts_at > now()) AS next_available_at
     FROM agenda_doctors d
     JOIN auth_users u ON u.id = d.user_id
-    ORDER BY u.name
+    LEFT JOIN agenda_availability_slots s ON s.doctor_id = d.id
+    GROUP BY d.id, d.specialty, d.license_number, d.office, u.name, u.email
+    ORDER BY available_slots DESC, u.name
   `);
   res.json({ doctors: result.rows });
 });

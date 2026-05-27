@@ -155,7 +155,7 @@ def build():
                 "Publicacion de bloques de disponibilidad.",
                 "Consulta de agenda y pacientes desde portal medico.",
                 "Registro de pacientes desde portal medico.",
-                "Consulta de medicos y horarios disponibles.",
+                "Consulta de medicos disponibles, contador de horarios y proximo horario.",
                 "Agendamiento, modificacion, reprogramacion y cancelacion de citas.",
                 "Generacion de notificaciones internas.",
                 "Registro de resultados medicos por el medico.",

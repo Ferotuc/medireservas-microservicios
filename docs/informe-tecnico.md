@@ -139,7 +139,7 @@ El contrato OpenAPI se encuentra en `docs/openapi.yml`. Los endpoints estan agru
 Al ejecutar el proyecto se puede evidenciar:
 
 1. Pantalla de inicio de sesion y registro.
-2. Listado de medicos.
+2. Listado de medicos disponibles con contador de horarios futuros.
 3. Configuracion de perfil medico y publicacion de disponibilidad.
 4. Listado y registro de pacientes desde portal medico.
 5. Reserva de cita desde cuenta de paciente.

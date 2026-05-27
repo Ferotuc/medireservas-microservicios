@@ -105,11 +105,29 @@ const renderSession = async () => {
 
 const loadDoctors = async () => {
   const { doctors } = await api('/api/agenda/doctors');
-  qs('#doctorsList').innerHTML = doctors.map((doctor) => `
+  const doctorsToRender = state.user?.role === 'patient'
+    ? doctors.filter((doctor) => Number(doctor.available_slots) > 0)
+    : doctors;
+
+  qs('#doctorsTitle').textContent = state.user?.role === 'patient' ? 'Medicos disponibles' : 'Medicos';
+
+  if (state.user?.role === 'patient' && !doctorsToRender.length) {
+    qs('#doctorsList').innerHTML = `
+      <div class="item">
+        <strong>No hay medicos con horarios disponibles</strong>
+        <small>Un medico debe publicar disponibilidad futura para que puedas agendar.</small>
+      </div>
+    `;
+    qs('#slotsList').innerHTML = '<small>Selecciona un medico con disponibilidad para ver horarios.</small>';
+    return;
+  }
+
+  qs('#doctorsList').innerHTML = doctorsToRender.map((doctor) => `
     <div class="item">
       <strong>${doctor.name}</strong>
       <small>${doctor.specialty} - ${doctor.office}</small>
-      <button type="button" data-doctor="${doctor.id}">Ver horarios</button>
+      <small>${Number(doctor.available_slots) || 0} horarios disponibles${doctor.next_available_at ? ` - Proximo: ${new Date(doctor.next_available_at).toLocaleString()}` : ''}</small>
+      <button type="button" data-doctor="${doctor.id}" ${Number(doctor.available_slots) === 0 ? 'disabled' : ''}>Ver horarios</button>
     </div>
   `).join('') || '<small>No hay medicos registrados.</small>';
 
