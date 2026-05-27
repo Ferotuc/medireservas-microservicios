@@ -59,6 +59,16 @@ const requireRole = (...roles) => (req, res, next) => {
   return next();
 };
 
+const ensureDoctorProfile = async (user) => {
+  if (user.role !== 'doctor') return;
+  await pool.query(
+    `INSERT INTO agenda_doctors (user_id, specialty, license_number, office)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (user_id) DO NOTHING`,
+    [user.id, 'Medicina general', `PEND-${user.id.slice(0, 8)}`, 'Consultorio por definir']
+  );
+};
+
 app.get('/health', (_req, res) => res.json({ service: 'auth', status: 'ok' }));
 
 app.post('/api/auth/register', async (req, res) => {
@@ -72,6 +82,7 @@ app.post('/api/auth/register', async (req, res) => {
       [name, email, hashPassword(password), role]
     );
     const user = result.rows[0];
+    await ensureDoctorProfile(user);
     res.status(201).json({ user, token: sign(user) });
   } catch (error) {
     if (error.code === '23505') return res.status(409).json({ message: 'El correo ya esta registrado' });
@@ -118,6 +129,7 @@ app.post('/api/auth/users', authRequired, requireRole('doctor', 'admin'), async 
       'INSERT INTO auth_users (name, email, password_hash, role) VALUES ($1, lower($2), $3, $4) RETURNING id, name, email, role, created_at',
       [name, email, hashPassword(password), role]
     );
+    await ensureDoctorProfile(result.rows[0]);
     res.status(201).json({ user: result.rows[0] });
   } catch (error) {
     if (error.code === '23505') return res.status(409).json({ message: 'El correo ya esta registrado' });

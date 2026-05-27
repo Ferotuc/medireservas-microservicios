@@ -84,7 +84,16 @@ app.post('/api/agenda/doctors', authRequired, requireRole('doctor', 'admin'), as
 
 app.post('/api/agenda/availability', authRequired, requireRole('doctor', 'admin'), async (req, res) => {
   const { startsAt, endsAt } = req.body;
-  const doctor = await pool.query('SELECT id FROM agenda_doctors WHERE user_id = $1', [req.user.id]);
+  let doctor = await pool.query('SELECT id FROM agenda_doctors WHERE user_id = $1', [req.user.id]);
+  if (!doctor.rows[0] && req.user.role === 'doctor') {
+    doctor = await pool.query(
+      `INSERT INTO agenda_doctors (user_id, specialty, license_number, office)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (user_id) DO UPDATE SET user_id = EXCLUDED.user_id
+       RETURNING id`,
+      [req.user.id, 'Medicina general', `PEND-${req.user.id.slice(0, 8)}`, 'Consultorio por definir']
+    );
+  }
   if (!doctor.rows[0]) return res.status(404).json({ message: 'Primero registra el perfil medico' });
 
   const result = await pool.query(
