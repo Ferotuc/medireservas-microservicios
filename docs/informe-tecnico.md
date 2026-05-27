@@ -21,12 +21,15 @@ El MVP permite registrar usuarios con rol de paciente o medico, iniciar sesion, 
 2. El sistema debe diferenciar roles de paciente, medico y administrador.
 3. El medico debe poder registrar o actualizar su perfil profesional.
 4. El medico debe poder publicar bloques de disponibilidad.
-5. El paciente debe poder consultar medicos y horarios disponibles.
-6. El paciente debe poder agendar una cita en un horario disponible.
-7. El paciente o medico debe poder cancelar una cita.
-8. El sistema debe generar notificaciones internas al agendar o cancelar citas.
-9. El medico debe poder registrar resultados de consulta.
-10. El paciente debe poder consultar sus resultados.
+5. El medico debe poder consultar su agenda de citas.
+6. El medico debe poder listar y registrar pacientes para apoyo operativo.
+7. El paciente debe poder consultar medicos y horarios disponibles.
+8. El paciente debe poder agendar una cita en un horario disponible.
+9. El paciente debe poder modificar el motivo o reprogramar una cita.
+10. El paciente o medico debe poder cancelar una cita.
+11. El sistema debe generar notificaciones internas al agendar, reprogramar o cancelar citas.
+12. El medico debe poder registrar resultados de consulta.
+13. El paciente debe poder consultar sus resultados.
 
 ## Requerimientos no funcionales
 
@@ -138,11 +141,13 @@ Al ejecutar el proyecto se puede evidenciar:
 1. Pantalla de inicio de sesion y registro.
 2. Listado de medicos.
 3. Publicacion de disponibilidad desde cuenta de medico.
-4. Reserva de cita desde cuenta de paciente.
-5. Cancelacion de cita.
-6. Notificaciones internas generadas por el servicio de agenda.
-7. Registro de resultados medicos por el medico.
-8. Consulta de resultados medicos por el paciente.
+4. Listado y registro de pacientes desde portal medico.
+5. Reserva de cita desde cuenta de paciente.
+6. Modificacion y reprogramacion de cita desde cuenta de paciente.
+7. Cancelacion de cita.
+8. Notificaciones internas generadas por el servicio de agenda.
+9. Registro de resultados medicos por el medico.
+10. Consulta de resultados medicos por el paciente.
 
 Las capturas de pantalla para el PDF pueden tomarse desde `http://localhost:8081` despues de levantar los contenedores.
 

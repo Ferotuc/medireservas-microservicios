@@ -51,6 +51,33 @@ paths:
       summary: Devuelve el usuario autenticado
       responses:
         "200": { description: Usuario autenticado }
+  /api/auth/users:
+    get:
+      tags: [Auth]
+      summary: Lista usuarios por rol
+      parameters:
+        - in: query
+          name: role
+          schema: { type: string, enum: [patient, doctor, admin] }
+      responses:
+        "200": { description: Usuarios encontrados }
+    post:
+      tags: [Auth]
+      summary: Crea un usuario desde una cuenta autorizada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string }
+                role: { type: string, enum: [patient, doctor, admin] }
+      responses:
+        "201": { description: Usuario creado }
   /api/agenda/doctors:
     get:
       tags: [Agenda]
@@ -128,12 +155,22 @@ paths:
   /api/agenda/appointments/{id}:
     patch:
       tags: [Agenda]
-      summary: Actualiza una cita
+      summary: Actualiza o reprograma una cita
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string, format: uuid }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string }
+                status: { type: string, enum: [scheduled, rescheduled, cancelled, completed] }
+                slotId: { type: string, format: uuid }
       responses:
         "200": { description: Cita actualizada }
     delete:

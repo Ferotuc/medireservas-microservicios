@@ -196,6 +196,7 @@ button:hover {
 
 .item button {
   margin-top: 10px;
+  margin-right: 8px;
   padding: 0.6rem 0.8rem;
 }
 

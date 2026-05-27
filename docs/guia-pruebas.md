@@ -38,7 +38,9 @@ Resultado esperado:
 1. Iniciar sesion con `ana.doctor@demo.com` y `Demo123!`.
 2. Crear un horario en la seccion Disponibilidad.
 3. Revisar la agenda en Mis citas cuando el paciente agende.
-4. Registrar un resultado medico en la seccion Resultados medicos.
+4. Ver pacientes registrados en la seccion Pacientes.
+5. Agregar un nuevo paciente desde la seccion Pacientes.
+6. Registrar un resultado medico en la seccion Resultados medicos.
 
 ### Paciente
 
@@ -47,8 +49,11 @@ Resultado esperado:
 3. Ver horarios disponibles.
 4. Agendar una cita con un motivo.
 5. Revisar Mis citas.
-6. Revisar Notificaciones.
-7. Consultar Resultados medicos cuando el medico registre el resultado.
+6. Modificar el motivo de la cita.
+7. Reprogramar la cita a otro horario disponible.
+8. Cancelar una cita si se necesita.
+9. Revisar Notificaciones.
+10. Consultar Resultados medicos cuando el medico registre el resultado.
 
 ## 4. Smoke test automatizado
 
@@ -61,9 +66,11 @@ Con los contenedores levantados:
 El script valida:
 
 - login de medico y paciente;
+- creacion y listado de pacientes desde portal medico;
 - listado de medicos;
 - creacion de disponibilidad;
 - agendamiento de cita;
+- modificacion y reprogramacion de cita;
 - creacion de notificacion;
 - registro de resultado medico;
 - consulta de resultados por paciente.

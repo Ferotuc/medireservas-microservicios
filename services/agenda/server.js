@@ -155,20 +155,65 @@ app.get('/api/agenda/appointments/me', authRequired, async (req, res) => {
 });
 
 app.patch('/api/agenda/appointments/:id', authRequired, async (req, res) => {
-  const { reason, status } = req.body;
+  const { reason, status, slotId } = req.body;
   if (status && !['scheduled', 'rescheduled', 'cancelled', 'completed'].includes(status)) return res.status(400).json({ message: 'Estado invalido' });
 
-  const result = await pool.query(
-    `UPDATE agenda_appointments
-     SET reason = COALESCE($1, reason), status = COALESCE($2, status), updated_at = now()
-     WHERE id = $3 AND (patient_id = $4 OR EXISTS (
-       SELECT 1 FROM agenda_doctors d WHERE d.id = doctor_id AND d.user_id = $4
-     ))
-     RETURNING *`,
-    [reason, status, req.params.id, req.user.id]
-  );
-  if (!result.rows[0]) return res.status(404).json({ message: 'Cita no encontrada' });
-  res.json({ appointment: result.rows[0] });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const current = await client.query(
+      `SELECT a.*, d.user_id AS doctor_user_id
+       FROM agenda_appointments a
+       JOIN agenda_doctors d ON d.id = a.doctor_id
+       WHERE a.id = $1 AND (a.patient_id = $2 OR d.user_id = $2)
+       FOR UPDATE`,
+      [req.params.id, req.user.id]
+    );
+    const appointment = current.rows[0];
+    if (!appointment) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'Cita no encontrada' });
+    }
+
+    let nextStatus = status || appointment.status;
+    if (slotId && slotId !== appointment.slot_id) {
+      const nextSlot = await client.query(
+        `SELECT id FROM agenda_availability_slots
+         WHERE id = $1 AND doctor_id = $2 AND status = 'available'
+         FOR UPDATE`,
+        [slotId, appointment.doctor_id]
+      );
+      if (!nextSlot.rows[0]) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({ message: 'El nuevo horario no esta disponible' });
+      }
+      await client.query(`UPDATE agenda_availability_slots SET status = 'available' WHERE id = $1`, [appointment.slot_id]);
+      await client.query(`UPDATE agenda_availability_slots SET status = 'booked' WHERE id = $1`, [slotId]);
+      nextStatus = 'rescheduled';
+    }
+
+    const result = await client.query(
+      `UPDATE agenda_appointments
+       SET reason = COALESCE($1, reason),
+           status = $2,
+           slot_id = COALESCE($3, slot_id),
+           updated_at = now()
+       WHERE id = $4
+       RETURNING *`,
+      [reason, nextStatus, slotId || null, req.params.id]
+    );
+    await client.query('COMMIT');
+
+    if (slotId && slotId !== appointment.slot_id) {
+      await notify(appointment.patient_id, 'Cita reprogramada', 'Tu cita medica fue reprogramada correctamente.');
+    }
+    res.json({ appointment: result.rows[0] });
+  } catch {
+    await client.query('ROLLBACK');
+    res.status(500).json({ message: 'No se pudo modificar la cita' });
+  } finally {
+    client.release();
+  }
 });
 
 app.delete('/api/agenda/appointments/:id', authRequired, async (req, res) => {
@@ -201,4 +246,3 @@ app.delete('/api/agenda/appointments/:id', authRequired, async (req, res) => {
 });
 
 app.listen(port, () => console.log(`agenda-service listening on ${port}`));
-

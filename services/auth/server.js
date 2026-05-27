@@ -54,6 +54,11 @@ const authRequired = (req, res, next) => {
   }
 };
 
+const requireRole = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.user.role)) return res.status(403).json({ message: 'Permisos insuficientes' });
+  return next();
+};
+
 app.get('/health', (_req, res) => res.json({ service: 'auth', status: 'ok' }));
 
 app.post('/api/auth/register', async (req, res) => {
@@ -92,7 +97,34 @@ app.get('/api/auth/me', authRequired, async (req, res) => {
   res.json({ user: result.rows[0] });
 });
 
+app.get('/api/auth/users', authRequired, requireRole('doctor', 'admin'), async (req, res) => {
+  const { role = 'patient' } = req.query;
+  if (!['patient', 'doctor', 'admin'].includes(role)) return res.status(400).json({ message: 'Rol invalido' });
+
+  const result = await pool.query(
+    'SELECT id, name, email, role, created_at FROM auth_users WHERE role = $1 ORDER BY created_at DESC',
+    [role]
+  );
+  res.json({ users: result.rows });
+});
+
+app.post('/api/auth/users', authRequired, requireRole('doctor', 'admin'), async (req, res) => {
+  const { name, email, password, role = 'patient' } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ message: 'name, email y password son obligatorios' });
+  if (!['patient', 'doctor', 'admin'].includes(role)) return res.status(400).json({ message: 'Rol invalido' });
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO auth_users (name, email, password_hash, role) VALUES ($1, lower($2), $3, $4) RETURNING id, name, email, role, created_at',
+      [name, email, hashPassword(password), role]
+    );
+    res.status(201).json({ user: result.rows[0] });
+  } catch (error) {
+    if (error.code === '23505') return res.status(409).json({ message: 'El correo ya esta registrado' });
+    res.status(500).json({ message: 'Error creando usuario' });
+  }
+});
+
 app.get('/internal/verify', authRequired, (req, res) => res.json({ user: req.user }));
 
 app.listen(port, () => console.log(`auth-service listening on ${port}`));
-

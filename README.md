@@ -36,12 +36,15 @@ Usuarios demo:
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
+- `GET /api/auth/users?role=patient`
+- `POST /api/auth/users`
 - `GET /api/agenda/doctors`
 - `POST /api/agenda/doctors`
 - `POST /api/agenda/availability`
 - `GET /api/agenda/doctors/{doctorId}/availability`
 - `POST /api/agenda/appointments`
 - `GET /api/agenda/appointments/me`
+- `PATCH /api/agenda/appointments/{id}`
 - `DELETE /api/agenda/appointments/{id}`
 - `GET /api/notifications/me`
 - `POST /api/records/results`
@@ -57,4 +60,4 @@ Con los contenedores levantados, ejecuta:
 .\scripts\smoke-test.ps1
 ```
 
-La guia completa de pruebas esta en [`docs/guia-pruebas.md`](docs/guia-pruebas.md).
+La prueba valida registro/listado de pacientes, agendamiento, modificacion, reprogramacion, cancelacion logica por API, notificaciones y resultados medicos. La guia completa esta en [`docs/guia-pruebas.md`](docs/guia-pruebas.md).

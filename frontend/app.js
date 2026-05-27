@@ -2,7 +2,8 @@ const state = {
   token: localStorage.getItem('token'),
   user: JSON.parse(localStorage.getItem('user') || 'null'),
   selectedDoctor: null,
-  appointments: []
+  appointments: [],
+  patients: []
 };
 
 const qs = (selector) => document.querySelector(selector);
@@ -74,7 +75,9 @@ const renderSession = async () => {
   qs('#userTitle').textContent = `${state.user.name} (${state.user.role})`;
   qs('#availabilityForm').classList.toggle('hidden', state.user.role !== 'doctor');
   qs('#recordForm').classList.toggle('hidden', state.user.role !== 'doctor');
+  qs('#patientsPanel').classList.toggle('hidden', state.user.role !== 'doctor');
   await Promise.all([loadDoctors(), loadAppointments(), loadNotifications()]);
+  if (state.user.role === 'doctor') await loadPatients();
   await loadRecords();
 };
 
@@ -127,6 +130,8 @@ const loadAppointments = async () => {
       <small>${appointment.patient_name} con ${appointment.doctor_name} - ${appointment.status}</small>
       <p>${appointment.reason}</p>
       ${state.user.role === 'doctor' && appointment.status !== 'cancelled' ? `<button type="button" data-record="${appointment.id}">Registrar resultado</button>` : ''}
+      ${state.user.role === 'patient' && appointment.status !== 'cancelled' ? `<button type="button" data-edit="${appointment.id}">Modificar motivo</button>` : ''}
+      ${state.user.role === 'patient' && appointment.status !== 'cancelled' ? `<button type="button" data-reschedule="${appointment.id}">Reprogramar</button>` : ''}
       ${appointment.status !== 'cancelled' ? `<button class="danger" type="button" data-id="${appointment.id}">Cancelar</button>` : ''}
     </div>
   `).join('') || '<small>No tienes citas.</small>';
@@ -143,6 +148,44 @@ const loadAppointments = async () => {
     button.addEventListener('click', () => {
       qs('#recordAppointment').value = button.dataset.record;
       qs('#recordForm textarea[name="summary"]').focus();
+    });
+  });
+
+  qs('#appointmentsList').querySelectorAll('button[data-edit]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const appointment = state.appointments.find((item) => item.id === button.dataset.edit);
+      const reason = prompt('Nuevo motivo de la consulta', appointment?.reason || '');
+      if (!reason) return;
+      await api(`/api/agenda/appointments/${button.dataset.edit}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ reason })
+      });
+      toast('Cita modificada');
+      await loadAppointments();
+    });
+  });
+
+  qs('#appointmentsList').querySelectorAll('button[data-reschedule]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const appointment = state.appointments.find((item) => item.id === button.dataset.reschedule);
+      if (!appointment) return;
+      const { slots } = await api(`/api/agenda/doctors/${appointment.doctor_id}/availability`);
+      if (!slots.length) {
+        toast('No hay horarios disponibles para reprogramar');
+        return;
+      }
+      const menu = slots
+        .map((slot, index) => `${index + 1}. ${new Date(slot.starts_at).toLocaleString()}`)
+        .join('\n');
+      const selected = Number(prompt(`Elige un nuevo horario:\n${menu}`));
+      const slot = slots[selected - 1];
+      if (!slot) return;
+      await api(`/api/agenda/appointments/${appointment.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ slotId: slot.id })
+      });
+      toast('Cita reprogramada');
+      await Promise.all([loadAppointments(), loadNotifications()]);
     });
   });
 
@@ -184,6 +227,18 @@ const loadRecords = async () => {
       ${result.prescription ? `<small>Prescripcion: ${result.prescription}</small>` : ''}
     </div>
   `).join('') || '<small>No hay resultados registrados.</small>';
+};
+
+const loadPatients = async () => {
+  const { users } = await api('/api/auth/users?role=patient');
+  state.patients = users;
+  qs('#patientsList').innerHTML = users.map((patient) => `
+    <div class="item">
+      <strong>${patient.name}</strong>
+      <small>${patient.email}</small>
+      <small>Registrado: ${new Date(patient.created_at).toLocaleString()}</small>
+    </div>
+  `).join('') || '<small>No hay pacientes registrados.</small>';
 };
 
 qs('#loginTab').addEventListener('click', () => {
@@ -261,6 +316,23 @@ qs('#recordForm').addEventListener('submit', async (event) => {
     event.target.reset();
     toast('Resultado registrado');
     await loadRecords();
+  } catch (error) {
+    toast(error.message);
+  }
+});
+
+qs('#patientForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const body = Object.fromEntries(new FormData(event.target));
+  try {
+    await api('/api/auth/users', {
+      method: 'POST',
+      body: JSON.stringify({ ...body, role: 'patient' })
+    });
+    event.target.reset();
+    event.target.password.value = 'Paciente123!';
+    toast('Paciente agregado');
+    await loadPatients();
   } catch (error) {
     toast(error.message);
   }
