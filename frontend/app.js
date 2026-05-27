@@ -7,6 +7,27 @@ const state = {
 };
 
 const qs = (selector) => document.querySelector(selector);
+const roleLabels = {
+  patient: 'Paciente',
+  doctor: 'Medico',
+  admin: 'Administrador'
+};
+
+const statusLabels = {
+  available: 'Disponible',
+  booked: 'Reservado',
+  blocked: 'Bloqueado',
+  scheduled: 'Agendada',
+  rescheduled: 'Reprogramada',
+  cancelled: 'Cancelada',
+  completed: 'Completada',
+  pending: 'Pendiente',
+  sent: 'Enviada',
+  failed: 'Fallida',
+  read: 'Leida'
+};
+
+const labelFor = (labels, value) => labels[value] || value;
 const portal = window.location.port === '8082'
   ? {
       role: 'doctor',
@@ -72,7 +93,7 @@ const renderSession = async () => {
   qs('#appView').classList.toggle('hidden', !state.token);
   qs('.auth-card').classList.toggle('hidden', Boolean(state.token));
   if (!state.token) return;
-  qs('#userTitle').textContent = `${state.user.name} (${state.user.role})`;
+  qs('#userTitle').textContent = `${state.user.name} (${labelFor(roleLabels, state.user.role)})`;
   qs('#availabilityForm').classList.toggle('hidden', state.user.role !== 'doctor');
   qs('#recordForm').classList.toggle('hidden', state.user.role !== 'doctor');
   qs('#patientsPanel').classList.toggle('hidden', state.user.role !== 'doctor');
@@ -127,7 +148,7 @@ const loadAppointments = async () => {
   qs('#appointmentsList').innerHTML = appointments.map((appointment) => `
     <div class="item">
       <strong>${new Date(appointment.starts_at).toLocaleString()}</strong>
-      <small>${appointment.patient_name} con ${appointment.doctor_name} - ${appointment.status}</small>
+      <small>${appointment.patient_name} con ${appointment.doctor_name} - ${labelFor(statusLabels, appointment.status)}</small>
       <p>${appointment.reason}</p>
       ${state.user.role === 'doctor' && appointment.status !== 'cancelled' ? `<button type="button" data-record="${appointment.id}">Registrar resultado</button>` : ''}
       ${state.user.role === 'patient' && appointment.status !== 'cancelled' ? `<button type="button" data-edit="${appointment.id}">Modificar motivo</button>` : ''}
@@ -197,7 +218,7 @@ const loadNotifications = async () => {
   qs('#notificationsList').innerHTML = notifications.map((notification) => `
     <div class="item">
       <strong>${notification.subject}</strong>
-      <small>${new Date(notification.created_at).toLocaleString()} - ${notification.status}</small>
+      <small>${new Date(notification.created_at).toLocaleString()} - ${labelFor(statusLabels, notification.status)}</small>
       <p>${notification.body}</p>
     </div>
   `).join('') || '<small>No hay notificaciones.</small>';
