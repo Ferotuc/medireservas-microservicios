@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from docx import Document
@@ -9,7 +10,12 @@ from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "docs" / "MediReservas-Informe-Tecnico.docx"
+OUTPUT = Path(
+    os.environ.get(
+        "MEDIRESERVAS_DOCX_OUTPUT",
+        ROOT / "docs" / "MediReservas-Informe-Tecnico.docx",
+    )
+)
 
 
 BLUE = RGBColor(46, 116, 181)
@@ -149,43 +155,43 @@ def add_simple_table(doc, headers, rows):
     doc.add_paragraph()
 
 
+def add_diagram_image(doc, title, image_name, source_name):
+    path = ROOT / "docs" / "diagrams" / image_name
+    doc.add_heading(title, level=2)
+    source = doc.add_paragraph()
+    run = source.add_run(f"Fuente editable: docs/diagrams/{source_name}")
+    run.italic = True
+    run.font.color.rgb = MUTED
+    if path.exists():
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.add_run().add_picture(str(path), width=Inches(6.3))
+    else:
+        doc.add_paragraph(f"No se encontro la captura del diagrama: {path}")
+    doc.add_paragraph()
+
+
 def add_architecture_diagram(doc):
-    doc.add_heading("Diagrama de arquitectura general", level=2)
-    add_simple_table(
+    add_diagram_image(
         doc,
-        ["Entrada", "Gateway", "Microservicios", "Persistencia"],
-        [
-            (
-                "Paciente / Medico",
-                "NGINX API Gateway\nPuertos 8081 y 8082",
-                "Auth Service\nAgenda Service\nNotifications Service\nRecords Service",
-                "PostgreSQL\nTablas por dominio",
-            )
-        ],
+        "Diagrama de arquitectura general",
+        "arquitectura-general.png",
+        "arquitectura-general.mmd",
     )
 
 
 def add_extra_diagrams(doc):
-    doc.add_heading("Diagrama de casos de uso", level=2)
-    add_simple_table(
+    add_diagram_image(
         doc,
-        ["Actor", "Casos de uso"],
-        [
-            ("Paciente", "Registrarse, iniciar sesion, consultar medicos disponibles, agendar, modificar, reprogramar y cancelar citas, consultar notificaciones y resultados."),
-            ("Medico", "Iniciar sesion, configurar perfil medico, publicar disponibilidad, consultar agenda, listar/agregar pacientes y registrar resultados."),
-        ],
+        "Diagrama de casos de uso",
+        "casos-uso.png",
+        "casos-uso.mmd",
     )
-    doc.add_heading("Diagrama de secuencia: agendar cita", level=2)
-    add_numbered(
+    add_diagram_image(
         doc,
-        [
-            "Paciente envia POST /api/agenda/appointments al API Gateway.",
-            "Agenda Service valida el token con Auth Service.",
-            "Agenda Service bloquea el horario disponible en PostgreSQL.",
-            "Agenda Service crea la cita y marca el horario como reservado.",
-            "Agenda Service solicita a Notifications Service crear una notificacion.",
-            "El paciente recibe la confirmacion de la cita.",
-        ],
+        "Diagrama de secuencia: agendar cita",
+        "secuencia-agendar-cita.png",
+        "secuencia-agendar-cita.mmd",
     )
 
 
@@ -324,4 +330,3 @@ def build():
 
 if __name__ == "__main__":
     build()
-
