@@ -7,6 +7,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
     Flowable,
+    Image,
     PageBreak,
     Paragraph,
     SimpleDocTemplate,
@@ -301,6 +302,12 @@ def build():
             ],
             st["Body"],
         ),
+        Spacer(1, 0.12 * inch),
+        p("Captura: portal paciente", st["Heading2"]),
+        Image(str(ROOT / "docs" / "evidencia-paciente.png"), width=6.4 * inch, height=3.6 * inch),
+        Spacer(1, 0.12 * inch),
+        p("Captura: portal medico", st["Heading2"]),
+        Image(str(ROOT / "docs" / "evidencia-medico.png"), width=6.4 * inch, height=3.6 * inch),
         Spacer(1, 0.16 * inch),
         p("Instrucciones de ejecucion", st["Heading1"]),
         table(
