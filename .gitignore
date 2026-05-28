@@ -8,4 +8,5 @@ build/
 Thumbs.db
 .vscode/
 .idea/
-
+~$*.docx
+docs/~$*.docx

@@ -14,6 +14,19 @@ Plataforma de reservas para consultas medicas implementada con arquitectura de m
 
 ## Ejecucion local
 
+### Opcion rapida en Windows
+
+1. Instala y abre Docker Desktop.
+2. Descarga o clona este repositorio.
+3. Ejecuta doble clic sobre `autorun.bat`.
+
+El autorun crea `.env` si no existe, construye los contenedores, levanta la aplicacion y abre los portales:
+
+- Paciente: `http://localhost:8081`
+- Medico: `http://localhost:8082`
+
+### Opcion manual
+
 ```bash
 cp .env.example .env
 docker compose up --build
