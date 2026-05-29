@@ -10,3 +10,5 @@ Thumbs.db
 .idea/
 ~$*.docx
 docs/~$*.docx
+outputs/
+docs/artifact-build-manifest.json
